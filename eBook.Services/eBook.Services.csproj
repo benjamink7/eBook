@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.23.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 
@@ -16,5 +17,8 @@
   </PropertyGroup>
 <ItemGroup>
   <EmbeddedResource Include="Seed\Covers\*.png" />
+</ItemGroup>
+<ItemGroup>
+  <FrameworkReference Include="Microsoft.AspNetCore.App" />
 </ItemGroup>
 </Project>
