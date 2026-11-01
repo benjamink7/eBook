@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="eBook.API/eBook.API.csproj" />
+  <Project Path="eBook.Model/eBook.Model.csproj" />
+  <Project Path="eBook.Services/eBook.Services.csproj" />
+  <Project Path="eBook.Worker/eBook.Worker.csproj" />
+</Solution>
