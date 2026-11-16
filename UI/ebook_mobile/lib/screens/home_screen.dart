@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../core/auth_provider.dart';
 import 'catalog_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,23 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-
-    final pages = <Widget>[
-      const CatalogScreen(),
-      Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.account_circle, size: 72),
-            const SizedBox(height: 8),
-            Text(auth.username ?? ''),
-            const SizedBox(height: 16),
-            FilledButton(onPressed: auth.logout, child: const Text('Odjava')),
-          ],
-        ),
-      ),
-    ];
+    const pages = <Widget>[CatalogScreen(), ProfileScreen()];
 
     return Scaffold(
       body: SafeArea(child: pages[_index]),

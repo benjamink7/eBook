@@ -163,3 +163,56 @@ class BookPage {
         content: json['content'] as String,
       );
 }
+
+class SubscriptionPlan {
+  SubscriptionPlan({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.currency,
+    required this.durationInMonths,
+  });
+
+  final int id;
+  final String name;
+  final String? description;
+  final double price;
+  final String currency;
+  final int durationInMonths;
+
+  factory SubscriptionPlan.fromJson(Map<String, dynamic> json) => SubscriptionPlan(
+        id: json['id'] as int,
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        price: (json['price'] as num).toDouble(),
+        currency: json['currency'] as String,
+        durationInMonths: json['durationInMonths'] as int,
+      );
+}
+
+class Subscription {
+  Subscription({
+    required this.id,
+    required this.planName,
+    required this.status,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  final int id;
+  final String planName;
+  final String status;
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  bool get isActive => status == 'Active';
+
+  factory Subscription.fromJson(Map<String, dynamic> json) => Subscription(
+        id: json['id'] as int,
+        planName: json['planName'] as String,
+        status: json['status'] as String,
+        startDate: json['startDate'] == null ? null : DateTime.parse(json['startDate'] as String).toLocal(),
+        endDate: json['endDate'] == null ? null : DateTime.parse(json['endDate'] as String).toLocal(),
+      );
+}
