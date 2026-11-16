@@ -6,10 +6,12 @@ using eBook.API.Configuration;
 using eBook.API.Middleware;
 using eBook.Model.Constants;
 using eBook.Model.Messaging;
+using eBook.Model.Subscriptions;
 using eBook.Services.Database;
 using eBook.Services.Implementations;
 using eBook.Services.Interfaces;
 using eBook.Services.Messaging;
+using eBook.Services.Payments;
 using eBook.Services.Security;
 using eBook.Services.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -53,6 +55,11 @@ var rabbitMqSettings = new RabbitMqSettings(
     GetRequired(configuration, "RABBITMQ_USER"),
     GetRequired(configuration, "RABBITMQ_PASSWORD"));
 
+var stripeSettings = new StripeSettings(
+    GetRequired(configuration, "STRIPE_SECRET_KEY"),
+    GetRequired(configuration, "STRIPE_PUBLISHABLE_KEY"),
+    configuration["STRIPE_WEBHOOK_SECRET"] ?? string.Empty);
+
 var allowedOrigins = GetRequired(configuration, "CORS_ALLOWED_ORIGINS")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -61,6 +68,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddSingleton(rabbitMqSettings);
+builder.Services.AddSingleton(stripeSettings);
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -69,6 +77,8 @@ builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IPaymentGateway, StripePaymentGateway>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

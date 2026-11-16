@@ -513,6 +513,12 @@ namespace eBook.Services.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -576,6 +582,42 @@ namespace eBook.Services.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SubscriptionPlans");
+                });
+
+            modelBuilder.Entity("eBook.Services.Database.SubscriptionStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ChangedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FromStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("SubscriptionId");
+
+                    b.ToTable("SubscriptionStatusHistories");
                 });
 
             modelBuilder.Entity("eBook.Services.Database.User", b =>
@@ -857,6 +899,24 @@ namespace eBook.Services.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("eBook.Services.Database.SubscriptionStatusHistory", b =>
+                {
+                    b.HasOne("eBook.Services.Database.User", "ChangedByUser")
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("eBook.Services.Database.Subscription", "Subscription")
+                        .WithMany("StatusHistory")
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChangedByUser");
+
+                    b.Navigation("Subscription");
+                });
+
             modelBuilder.Entity("eBook.Services.Database.User", b =>
                 {
                     b.HasOne("eBook.Services.Database.City", "City")
@@ -923,6 +983,8 @@ namespace eBook.Services.Migrations
             modelBuilder.Entity("eBook.Services.Database.Subscription", b =>
                 {
                     b.Navigation("Payments");
+
+                    b.Navigation("StatusHistory");
                 });
 
             modelBuilder.Entity("eBook.Services.Database.SubscriptionPlan", b =>

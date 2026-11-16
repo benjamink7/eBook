@@ -16,6 +16,9 @@ public class Subscription
     public DateTime? CancelledAt { get; set; }
     public string? CancellationReason { get; set; }
 
+    // Optimisticko zakljucavanje: sprjecava dvostruku obradu iste uplate (confirm i webhook istovremeno).
+    public byte[] RowVersion { get; set; } = null!;
+
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
@@ -23,4 +26,5 @@ public class Subscription
     public SubscriptionPlan SubscriptionPlan { get; set; } = null!;
 
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public ICollection<SubscriptionStatusHistory> StatusHistory { get; set; } = new List<SubscriptionStatusHistory>();
 }

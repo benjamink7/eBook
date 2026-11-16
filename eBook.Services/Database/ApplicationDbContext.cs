@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<SubscriptionStatusHistory> SubscriptionStatusHistories => Set<SubscriptionStatusHistory>();
     public DbSet<ReadingProgress> ReadingProgresses => Set<ReadingProgress>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
@@ -127,9 +128,20 @@ public class ApplicationDbContext : DbContext
             e.Property(x => x.Status).HasConversion<int>();
             e.Property(x => x.StatusChangeNote).HasMaxLength(500);
             e.Property(x => x.CancellationReason).HasMaxLength(500);
+            e.Property(x => x.RowVersion).IsRowVersion();
             e.HasOne(x => x.User).WithMany(u => u.Subscriptions).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.SubscriptionPlan).WithMany(p => p.Subscriptions).HasForeignKey(x => x.SubscriptionPlanId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(x => new { x.UserId, x.Status });
+        });
+
+        modelBuilder.Entity<SubscriptionStatusHistory>(e =>
+        {
+            e.Property(x => x.FromStatus).HasConversion<int?>();
+            e.Property(x => x.ToStatus).HasConversion<int>();
+            e.Property(x => x.Note).HasMaxLength(500);
+            e.HasOne(x => x.Subscription).WithMany(s => s.StatusHistory).HasForeignKey(x => x.SubscriptionId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.ChangedByUser).WithMany().HasForeignKey(x => x.ChangedByUserId).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(x => x.SubscriptionId);
         });
 
         modelBuilder.Entity<Payment>(e =>
