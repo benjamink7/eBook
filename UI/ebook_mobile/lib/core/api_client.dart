@@ -55,6 +55,23 @@ class ApiClient {
       request.body = jsonEncode(body);
     }
 
+    return _execute(request, path);
+  }
+
+  Future<dynamic> putFile(
+    String path, {
+    required String field,
+    required List<int> bytes,
+    required String filename,
+  }) {
+    final request = http.MultipartRequest('PUT', uri(path))
+      ..headers.addAll({'Accept': 'application/json', ...authHeaders})
+      ..files.add(http.MultipartFile.fromBytes(field, bytes, filename: filename));
+
+    return _execute(request, path);
+  }
+
+  Future<dynamic> _execute(http.BaseRequest request, String path) async {
     http.Response response;
 
     try {
