@@ -79,6 +79,12 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IPaymentGateway, StripePaymentGateway>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<IReadingProgressService, ReadingProgressService>();
+builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INewsService, NewsService>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

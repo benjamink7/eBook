@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using eBook.Model.Books;
 using eBook.Model.Common;
 using eBook.Model.Enums;
@@ -17,6 +18,20 @@ public class BookService : IBookService
     public const int MaxCoverSizeBytes = 2 * 1024 * 1024;
     private const int MaxCharactersPerPage = 1800;
 
+    public static readonly Expression<Func<Book, BookListItemResponse>> ListItemProjection = book => new BookListItemResponse
+    {
+        Id = book.Id,
+        Title = book.Title,
+        AuthorName = book.Author.FirstName + " " + book.Author.LastName,
+        PublishedYear = book.PublishedYear,
+        AccessType = book.AccessType,
+        IsActive = book.IsActive,
+        HasCover = book.CoverImage != null,
+        Genres = book.BookGenres.Select(bg => bg.Genre.Name).OrderBy(name => name).ToList(),
+        AverageRating = book.Reviews.Average(review => (double?)review.Rating),
+        ReviewCount = book.Reviews.Count
+    };
+
     private readonly ApplicationDbContext _db;
     private readonly ICurrentUserService _currentUser;
 
@@ -26,7 +41,7 @@ public class BookService : IBookService
         _currentUser = currentUser;
     }
 
-    public Task<PagedResult<BookListItemResponse>> GetAsync(BookSearchRequest request)
+    public async Task<PagedResult<BookListItemResponse>> GetAsync(BookSearchRequest request)
     {
         var query = _db.Books.AsNoTracking().AsQueryable();
 
@@ -70,21 +85,9 @@ public class BookService : IBookService
             _ => query.OrderBy(book => book.Title)
         };
 
-        return ordered
-            .Select(book => new BookListItemResponse
-            {
-                Id = book.Id,
-                Title = book.Title,
-                AuthorName = book.Author.FirstName + " " + book.Author.LastName,
-                PublishedYear = book.PublishedYear,
-                AccessType = book.AccessType,
-                IsActive = book.IsActive,
-                HasCover = book.CoverImage != null,
-                Genres = book.BookGenres.Select(bg => bg.Genre.Name).OrderBy(name => name).ToList(),
-                AverageRating = book.Reviews.Average(review => (double?)review.Rating),
-                ReviewCount = book.Reviews.Count
-            })
-            .ToPagedResultAsync(request);
+        await RecordSearchAsync(request);
+
+        return await ordered.Select(ListItemProjection).ToPagedResultAsync(request);
     }
 
     public async Task<BookDetailsResponse> GetByIdAsync(int id)
@@ -288,6 +291,28 @@ public class BookService : IBookService
             TotalPages = book.PageCount,
             Content = content
         };
+    }
+
+    // Pretrage obicnih korisnika se pamte; to su stvarni podaci za preporuke.
+    private async Task RecordSearchAsync(BookSearchRequest request)
+    {
+        if (_currentUser.IsAdmin || request.Page != 1 || string.IsNullOrWhiteSpace(request.Search))
+        {
+            return;
+        }
+
+        var term = request.Search.Trim();
+        var genreExists = request.GenreId.HasValue && await _db.Genres.AnyAsync(genre => genre.Id == request.GenreId.Value);
+
+        _db.SearchHistories.Add(new SearchHistory
+        {
+            UserId = _currentUser.UserId,
+            Query = term.Length > 200 ? term[..200] : term,
+            GenreId = genreExists ? request.GenreId : null,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
     }
 
     private async Task<bool> HasPremiumAccessAsync()
