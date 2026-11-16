@@ -6,8 +6,7 @@ import 'package:provider/provider.dart';
 import '../core/api_exception.dart';
 import '../core/auth_provider.dart';
 import '../models/models.dart';
-import '../widgets/book_cover.dart';
-import 'book_details_screen.dart';
+import '../widgets/book_tile.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -209,38 +208,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
             );
           }
 
-          return _BookTile(book: _books[index]);
+          return BookTile(book: _books[index]);
         },
-      ),
-    );
-  }
-}
-
-class _BookTile extends StatelessWidget {
-  const _BookTile({required this.book});
-
-  final BookListItem book;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return ListTile(
-      leading: BookCover(coverUrl: book.coverUrl),
-      title: Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      subtitle: Text('${book.authorName} • ${book.publishedYear}\n${book.genres.join(', ')}'),
-      isThreeLine: true,
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => BookDetailsScreen(bookId: book.id))),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(book.isPremium ? Icons.workspace_premium : Icons.lock_open,
-              color: book.isPremium ? Colors.amber.shade800 : theme.colorScheme.outline),
-          Text(book.isPremium ? 'Premium' : 'Free', style: theme.textTheme.labelSmall),
-          if (book.averageRating != null)
-            Text('★ ${book.averageRating!.toStringAsFixed(1)}', style: theme.textTheme.labelSmall),
-        ],
       ),
     );
   }

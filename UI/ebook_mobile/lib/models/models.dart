@@ -216,3 +216,90 @@ class Subscription {
         endDate: json['endDate'] == null ? null : DateTime.parse(json['endDate'] as String).toLocal(),
       );
 }
+
+class AppNotification {
+  AppNotification({
+    required this.id,
+    required this.title,
+    required this.message,
+    required this.isRead,
+    required this.createdAt,
+  });
+
+  final int id;
+  final String title;
+  final String message;
+  bool isRead;
+  final DateTime createdAt;
+
+  factory AppNotification.fromJson(Map<String, dynamic> json) => AppNotification(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        message: json['message'] as String,
+        isRead: json['isRead'] as bool,
+        createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
+      );
+}
+
+class NewsItem {
+  NewsItem({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.createdAt,
+    required this.imageUrl,
+  });
+
+  final int id;
+  final String title;
+  final String content;
+  final DateTime createdAt;
+  final String imageUrl;
+
+  factory NewsItem.fromJson(Map<String, dynamic> json) => NewsItem(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        content: json['content'] as String,
+        createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
+        imageUrl: json['imageUrl'] as String,
+      );
+}
+
+class Recommendation {
+  Recommendation({required this.book, required this.reasons});
+
+  final BookListItem book;
+  final List<String> reasons;
+
+  factory Recommendation.fromJson(Map<String, dynamic> json) => Recommendation(
+        book: BookListItem.fromJson(json['book'] as Map<String, dynamic>),
+        reasons: List<String>.from(json['reasons'] as List),
+      );
+}
+
+class ReadingProgressItem {
+  ReadingProgressItem({
+    required this.bookId,
+    required this.title,
+    required this.coverUrl,
+    required this.currentPage,
+    required this.totalPages,
+    required this.isFinished,
+  });
+
+  final int bookId;
+  final String title;
+  final String? coverUrl;
+  final int currentPage;
+  final int totalPages;
+  final bool isFinished;
+
+  factory ReadingProgressItem.fromJson(Map<String, dynamic> json) => ReadingProgressItem(
+        bookId: json['bookId'] as int,
+        title: json['title'] as String,
+        coverUrl: json['coverUrl'] as String?,
+        currentPage: json['currentPage'] as int,
+        totalPages: json['totalPages'] as int,
+        isFinished: json['isFinished'] as bool,
+      );
+}
