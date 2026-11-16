@@ -3,6 +3,5 @@
 **/.vs/
 .git/
 .env
-ebook_desktop/
-ebook_mobile/
+UI/
 *.md
