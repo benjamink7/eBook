@@ -77,3 +77,89 @@ class BookListItem {
         coverUrl: json['coverUrl'] as String?,
       );
 }
+
+class BookDetails {
+  BookDetails({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.publishedYear,
+    required this.pageCount,
+    required this.isPremium,
+    required this.authorName,
+    required this.genres,
+    required this.averageRating,
+    required this.reviewCount,
+    required this.canRead,
+    required this.coverUrl,
+  });
+
+  final int id;
+  final String title;
+  final String description;
+  final int publishedYear;
+  final int pageCount;
+  final bool isPremium;
+  final String authorName;
+  final List<String> genres;
+  final double? averageRating;
+  final int reviewCount;
+  final bool canRead;
+  final String? coverUrl;
+
+  factory BookDetails.fromJson(Map<String, dynamic> json) => BookDetails(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        description: json['description'] as String,
+        publishedYear: json['publishedYear'] as int,
+        pageCount: json['pageCount'] as int,
+        isPremium: json['accessType'] == 'Premium',
+        authorName: json['authorName'] as String,
+        genres: (json['genres'] as List).map((g) => (g as Map<String, dynamic>)['name'] as String).toList(),
+        averageRating: (json['averageRating'] as num?)?.toDouble(),
+        reviewCount: json['reviewCount'] as int,
+        canRead: json['canRead'] as bool,
+        coverUrl: json['coverUrl'] as String?,
+      );
+}
+
+class Review {
+  Review({
+    required this.id,
+    required this.username,
+    required this.rating,
+    required this.comment,
+    required this.createdAt,
+    required this.isMine,
+  });
+
+  final int id;
+  final String username;
+  final int rating;
+  final String? comment;
+  final DateTime createdAt;
+  final bool isMine;
+
+  factory Review.fromJson(Map<String, dynamic> json) => Review(
+        id: json['id'] as int,
+        username: json['username'] as String,
+        rating: json['rating'] as int,
+        comment: json['comment'] as String?,
+        createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
+        isMine: json['isMine'] as bool,
+      );
+}
+
+class BookPage {
+  BookPage({required this.pageNumber, required this.totalPages, required this.content});
+
+  final int pageNumber;
+  final int totalPages;
+  final String content;
+
+  factory BookPage.fromJson(Map<String, dynamic> json) => BookPage(
+        pageNumber: json['pageNumber'] as int,
+        totalPages: json['totalPages'] as int,
+        content: json['content'] as String,
+      );
+}

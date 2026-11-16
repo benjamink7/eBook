@@ -7,6 +7,7 @@ import '../core/api_exception.dart';
 import '../core/auth_provider.dart';
 import '../models/models.dart';
 import '../widgets/book_cover.dart';
+import 'book_details_screen.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -229,6 +230,8 @@ class _BookTile extends StatelessWidget {
       title: Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       subtitle: Text('${book.authorName} • ${book.publishedYear}\n${book.genres.join(', ')}'),
       isThreeLine: true,
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => BookDetailsScreen(bookId: book.id))),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
