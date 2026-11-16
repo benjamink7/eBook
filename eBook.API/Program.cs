@@ -1,9 +1,14 @@
+using System.Text;
+using System.Threading.RateLimiting;
 using DotNetEnv;
+using eBook.API.Configuration;
 using eBook.API.Middleware;
 using eBook.Model.Constants;
+using eBook.Model.Messaging;
 using eBook.Services.Database;
 using eBook.Services.Implementations;
 using eBook.Services.Interfaces;
+using eBook.Services.Messaging;
 using eBook.Services.Security;
 using eBook.Services.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,7 +16,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.Text;
 
 // Lokalno (izvan Dockera) konfiguracija se cita iz .env fajla; u kontejneru je ubacuje docker-compose.
 if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
@@ -42,6 +46,12 @@ if (Encoding.UTF8.GetByteCount(jwtSettings.Key) < 32)
     throw new InvalidOperationException("JWT_KEY mora imati najmanje 32 znaka.");
 }
 
+var rabbitMqSettings = new RabbitMqSettings(
+    GetRequired(configuration, "RABBITMQ_HOST"),
+    int.Parse(GetRequired(configuration, "RABBITMQ_PORT")),
+    GetRequired(configuration, "RABBITMQ_USER"),
+    GetRequired(configuration, "RABBITMQ_PASSWORD"));
+
 var allowedOrigins = GetRequired(configuration, "CORS_ALLOWED_ORIGINS")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -49,7 +59,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddSingleton(rabbitMqSettings);
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+builder.Services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICityService, CityService>();
@@ -93,6 +105,20 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+
+// Ogranicava broj pokusaja na osjetljivim endpointima (npr. pogadjanje koda za reset lozinke).
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy(RateLimitPolicies.Auth, httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(1)
+        }));
+});
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -115,6 +141,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

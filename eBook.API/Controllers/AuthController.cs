@@ -1,7 +1,10 @@
+using eBook.API.Configuration;
 using eBook.Model.Auth;
+using eBook.Model.Common;
 using eBook.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace eBook.API.Controllers;
 
@@ -43,5 +46,26 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponse>> ChangePassword(ChangePasswordRequest request)
     {
         return Ok(await _authService.ChangePasswordAsync(request));
+    }
+
+    [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.Auth)]
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<MessageResponse>> ForgotPassword(ForgotPasswordRequest request)
+    {
+        await _authService.ForgotPasswordAsync(request);
+
+        return Ok(new MessageResponse(
+            "Ako nalog s unesenom e-mail adresom postoji, poslali smo vam kod za reset lozinke."));
+    }
+
+    [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.Auth)]
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<MessageResponse>> ResetPassword(ResetPasswordRequest request)
+    {
+        await _authService.ResetPasswordAsync(request);
+
+        return Ok(new MessageResponse("Lozinka je uspješno promijenjena. Sada se možete prijaviti."));
     }
 }
