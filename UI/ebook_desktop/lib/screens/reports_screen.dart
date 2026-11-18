@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
@@ -86,7 +87,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         return;
       }
 
-      await Printing.layoutPdf(name: name, onLayout: (_) async => Uint8List.fromList(bytes));
+      await _showResult(name, Uint8List.fromList(bytes));
     } on ApiException catch (e) {
       showMessage(e.message);
     } catch (_) {
@@ -95,6 +96,43 @@ class _ReportsScreenState extends State<ReportsScreen> {
       if (mounted) {
         setState(() => _busy = false);
       }
+    }
+  }
+
+  Future<void> _showResult(String name, Uint8List bytes) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Izvještaj je spreman'),
+        content: const Text('Izvještaj možete sačuvati kao PDF ili ga ispisati.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Zatvori')),
+          OutlinedButton.icon(
+            onPressed: () async {
+              await Printing.layoutPdf(name: name, onLayout: (_) async => bytes);
+            },
+            icon: const Icon(Icons.print_outlined),
+            label: const Text('Ispiši'),
+          ),
+          FilledButton.icon(
+            onPressed: () => _save(name, bytes),
+            icon: const Icon(Icons.download_outlined),
+            label: const Text('Sačuvaj PDF'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save(String name, Uint8List bytes) async {
+    try {
+      final target = await FilePicker.saveFile(dialogTitle: 'Sačuvaj izvještaj', fileName: '$name.pdf', bytes: bytes);
+
+      if (target != null) {
+        showMessage('Izvještaj je sačuvan.');
+      }
+    } catch (_) {
+      showMessage('Izvještaj nije moguće sačuvati.');
     }
   }
 
