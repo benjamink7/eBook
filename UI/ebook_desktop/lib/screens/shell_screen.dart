@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/auth_provider.dart';
+import 'authors_screen.dart';
+import 'books_screen.dart';
 import 'cities_screen.dart';
 import 'countries_screen.dart';
 import 'dashboard_screen.dart';
 import 'genres_screen.dart';
+import 'news_screen.dart';
 import 'plans_screen.dart';
+import 'reports_screen.dart';
 import 'subscriptions_screen.dart';
 import 'users_screen.dart';
 
@@ -30,12 +34,16 @@ class _ShellScreenState extends State<ShellScreen> {
 
   static final List<_Section> _sections = [
     _Section('Početna', Icons.dashboard_outlined, () => const DashboardScreen()),
+    _Section('Knjige', Icons.menu_book_outlined, () => const BooksScreen()),
+    _Section('Autori', Icons.edit_note_outlined, () => const AuthorsScreen()),
+    _Section('Žanrovi', Icons.category_outlined, () => const GenresScreen()),
+    _Section('Novosti', Icons.newspaper_outlined, () => const NewsScreen()),
     _Section('Korisnici', Icons.people_outline, () => const UsersScreen()),
     _Section('Pretplate', Icons.workspace_premium_outlined, () => const SubscriptionsScreen()),
     _Section('Planovi', Icons.sell_outlined, () => const PlansScreen()),
-    _Section('Žanrovi', Icons.category_outlined, () => const GenresScreen()),
     _Section('Države', Icons.public_outlined, () => const CountriesScreen()),
     _Section('Gradovi', Icons.location_city_outlined, () => const CitiesScreen()),
+    _Section('Izvještaji', Icons.picture_as_pdf_outlined, () => const ReportsScreen()),
   ];
 
   @override

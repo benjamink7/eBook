@@ -283,3 +283,131 @@ class StatusHistoryEntry {
         changedBy: json['changedBy'] as String,
       );
 }
+
+class Author {
+  Author({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.biography,
+    required this.birthYear,
+    required this.bookCount,
+  });
+
+  final int id;
+  final String firstName;
+  final String lastName;
+  final String? biography;
+  final int? birthYear;
+  final int bookCount;
+
+  String get fullName => '$firstName $lastName';
+
+  factory Author.fromJson(Map<String, dynamic> json) => Author(
+        id: json['id'] as int,
+        firstName: json['firstName'] as String,
+        lastName: json['lastName'] as String,
+        biography: json['biography'] as String?,
+        birthYear: json['birthYear'] as int?,
+        bookCount: json['bookCount'] as int,
+      );
+}
+
+class BookRow {
+  BookRow({
+    required this.id,
+    required this.title,
+    required this.authorName,
+    required this.publishedYear,
+    required this.isPremium,
+    required this.isActive,
+    required this.genres,
+    required this.averageRating,
+    required this.coverUrl,
+  });
+
+  final int id;
+  final String title;
+  final String authorName;
+  final int publishedYear;
+  final bool isPremium;
+  final bool isActive;
+  final List<String> genres;
+  final double? averageRating;
+  final String? coverUrl;
+
+  factory BookRow.fromJson(Map<String, dynamic> json) => BookRow(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        authorName: json['authorName'] as String,
+        publishedYear: json['publishedYear'] as int,
+        isPremium: json['accessType'] == 'Premium',
+        isActive: json['isActive'] as bool,
+        genres: List<String>.from(json['genres'] as List),
+        averageRating: (json['averageRating'] as num?)?.toDouble(),
+        coverUrl: json['coverUrl'] as String?,
+      );
+}
+
+class BookDetails {
+  BookDetails({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.publishedYear,
+    required this.isPremium,
+    required this.isActive,
+    required this.authorId,
+    required this.genreIds,
+    required this.coverUrl,
+  });
+
+  final int id;
+  final String title;
+  final String description;
+  final int publishedYear;
+  final bool isPremium;
+  final bool isActive;
+  final int authorId;
+  final Set<int> genreIds;
+  final String? coverUrl;
+
+  factory BookDetails.fromJson(Map<String, dynamic> json) => BookDetails(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        description: json['description'] as String,
+        publishedYear: json['publishedYear'] as int,
+        isPremium: json['accessType'] == 'Premium',
+        isActive: json['isActive'] as bool,
+        authorId: json['authorId'] as int,
+        genreIds: (json['genres'] as List).map((g) => (g as Map<String, dynamic>)['id'] as int).toSet(),
+        coverUrl: json['coverUrl'] as String?,
+      );
+}
+
+class NewsRow {
+  NewsRow({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.createdAt,
+    required this.createdBy,
+    required this.imageUrl,
+  });
+
+  final int id;
+  final String title;
+  final String content;
+  final DateTime createdAt;
+  final String createdBy;
+  final String imageUrl;
+
+  factory NewsRow.fromJson(Map<String, dynamic> json) => NewsRow(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        content: json['content'] as String,
+        createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
+        createdBy: json['createdBy'] as String,
+        imageUrl: json['imageUrl'] as String,
+      );
+}

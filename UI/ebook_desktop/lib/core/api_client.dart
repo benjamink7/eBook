@@ -71,6 +71,20 @@ class ApiClient {
     return _execute(request, path);
   }
 
+  Future<dynamic> multipart(
+    String method,
+    String path, {
+    Map<String, String> fields = const {},
+    List<http.MultipartFile> files = const [],
+  }) {
+    final request = http.MultipartRequest(method, uri(path))
+      ..headers.addAll({'Accept': 'application/json', ...authHeaders})
+      ..fields.addAll(fields)
+      ..files.addAll(files);
+
+    return _execute(request, path);
+  }
+
   Future<dynamic> _execute(http.BaseRequest request, String path) async {
     http.Response response;
 
