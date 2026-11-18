@@ -87,7 +87,7 @@ class _NewsCard extends StatelessWidget {
               height: 150,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const SizedBox(height: 0),
+              errorBuilder: (_, _, _) => const SizedBox(height: 0),
             ),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -127,7 +127,7 @@ class NewsDetailsScreen extends StatelessWidget {
             headers: api.authHeaders,
             width: double.infinity,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox(height: 0),
+            errorBuilder: (_, _, _) => const SizedBox(height: 0),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
