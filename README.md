@@ -17,7 +17,7 @@ Dokumentacija preporučivača: [recommender-dokumentacija.md](recommender-dokume
 
 ## Pokretanje backenda
 
-Potrebni su Docker Desktop i `.env` fajl u korijenu repozitorija. `.env` nije na GitHubu; nalazi se u arhivi `.env-tajne.zip` (lozinka: `fit`) uz release. Raspakujte ga u korijen repozitorija (pored `docker-compose.yml`). Ako arhive nema, kopirajte `.env.example` u `.env` i unesite vlastite vrijednosti.
+Potrebni su Docker Desktop i `.env` fajl u korijenu repozitorija. `.env` nije na GitHubu; nalazi se u arhivi `.env-tajne.zip` (lozinka: `fit`) uz release; GitHub je prikazuje pod nazivom `default.env-tajne.zip`. Raspakujte ga u korijen repozitorija (pored `docker-compose.yml`). Ako arhive nema, kopirajte `.env.example` u `.env` i unesite vlastite vrijednosti.
 
 ```powershell
 docker compose up -d --build
