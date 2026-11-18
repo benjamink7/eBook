@@ -65,4 +65,28 @@ public static class EmailTemplates
             $"<p>Poštovani {name}, vraćeno vam je <b>{amount:0.00} {currency.ToUpperInvariant()}</b> na karticu kojom ste platili.</p>" +
             "<p>Povrat može biti vidljiv u roku od nekoliko radnih dana.</p>");
     }
+
+    public static EmailContent SubscriptionExpiringSoon(string firstName, string planName, DateTime endDate)
+    {
+        var name = WebUtility.HtmlEncode(firstName);
+        var plan = WebUtility.HtmlEncode(planName);
+
+        return new EmailContent(
+            "eBook – pretplata uskoro ističe",
+            $"<h2>Pretplata uskoro ističe</h2>" +
+            $"<p>Poštovani {name}, vaša pretplata <b>{plan}</b> ističe <b>{endDate:dd.MM.yyyy}</b>.</p>" +
+            "<p>Obnovite je na vrijeme kako biste zadržali pristup Premium knjigama.</p>");
+    }
+
+    public static EmailContent SubscriptionExpired(string firstName, string planName)
+    {
+        var name = WebUtility.HtmlEncode(firstName);
+        var plan = WebUtility.HtmlEncode(planName);
+
+        return new EmailContent(
+            "eBook – pretplata je istekla",
+            $"<h2>Pretplata je istekla</h2>" +
+            $"<p>Poštovani {name}, vaša pretplata <b>{plan}</b> je istekla.</p>" +
+            "<p>Premium knjige više nisu dostupne. Pretplatu možete obnoviti u aplikaciji.</p>");
+    }
 }
